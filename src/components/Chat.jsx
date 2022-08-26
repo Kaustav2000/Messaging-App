@@ -1,13 +1,13 @@
 import { AttachFile, MoreVert, SearchOutlined, Mic } from "@mui/icons-material";
 import InsertEmoticonOutlinedIcon from "@mui/icons-material/InsertEmoticonOutlined";
 import { Avatar, IconButton } from "@mui/material";
-import userEvent from "@testing-library/user-event";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import db from "../firebase";
+import { collection, addDoc, getDocs, FieldValue } from "firebase/firestore";
 import { useStateValue } from "../StateProvier";
 import "./Chat.css";
-import firebase from "firebase";
+// import firebase from "firebase";
+import db from "../firebase";
 
 const Chat = () => {
   const [seed, setSeed] = useState("");
@@ -16,20 +16,27 @@ const Chat = () => {
   const [roomName, setRoomName] = useState("");
   const [messages, setMessages] = useState([]);
   const [{ user }, dispatch] = useStateValue(null);
+  const collectionRef = collection(db, "rooms");
 
   useEffect(() => {
     if (roomId) {
-      db.collection("rooms")
-        .doc(roomId)
-        .onSnapshot((snapshot) => setRoomName(snapshot.data().name));
+      getDocs(collectionRef).then((response) => console.log(response));
 
-      db.collection("rooms")
-        .doc(roomId)
-        .collection("messages")
-        .orderBy("timestamp", "asc")
-        .onSnapshot((snapshot) =>
-          setMessages(snapshot.docs.map((doc) => doc.data()))
-        );
+      getDocs(collectionRef).then((res) =>
+        console.log(res.docs.map((item) => item.data()))
+      );
+
+      // db.collection("rooms")
+      //   .doc(roomId)
+      //   .onSnapshot((snapshot) => setRoomName(snapshot.data().name));
+
+      // db.collection("rooms")
+      //   .doc(roomId)
+      //   .collection("messages")
+      //   .orderBy("timestamp", "asc")
+      //   .onSnapshot((snapshot) =>
+      //     setMessages(snapshot.docs.map((doc) => doc.data()))
+      //   );
     }
 
     return () => {};
@@ -44,7 +51,7 @@ const Chat = () => {
     db.collection("rooms").doc(roomId).collection("messages").add({
       message: input,
       name: user.displayName,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      // timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     });
 
     setInput("");
