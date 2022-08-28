@@ -1,5 +1,6 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Router } from "react-router-dom";
 import "./App.css";
+import Blank from "./components/Blank";
 import Chat from "./components/Chat";
 import Login from "./components/Login";
 import Sidebar from "./components/Sidebar";
@@ -14,11 +15,10 @@ function App() {
         <Login />
       ) : (
         <div className="app__body">
+          <Sidebar />
           <Routes>
-            <Sidebar />
-            <Route path="/rooms/:roomId">
-              <Chat />
-            </Route>
+            <Route path="/" element={<Blank />} />
+            <Route path="/rooms/:roomId" element={<Chat />} />
           </Routes>
         </div>
       )}

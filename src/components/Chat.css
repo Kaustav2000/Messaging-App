@@ -67,6 +67,7 @@
 .chat__footer > .MuiSvgIcon-root {
   padding: 10px;
   color: gray;
+  cursor: pointer;
 }
 
 .chat__message {

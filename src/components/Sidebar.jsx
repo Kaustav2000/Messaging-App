@@ -10,23 +10,33 @@ import db from "../firebase";
 import { useStateValue } from "../StateProvier";
 import "./Sidebar.css";
 import SidebarChat from "./SidebarChat";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 
 const Sidebar = () => {
   const [rooms, setRooms] = useState([]);
-  const [{ user }, dispatch] = useStateValue(null);
+  const [{ user }, dispatch] = useStateValue();
+  const collectionRef = collection(db, "rooms");
 
   useEffect(() => {
-    const unsubscribe = db.collection("rooms").onSnapshot((snapshot) =>
+    getDocs(collectionRef).then((res) => {
       setRooms(
-        snapshot.docs.map((doc) => ({
+        res.docs.map((doc) => ({
           id: doc.id,
           data: doc.data(),
         }))
-      )
-    );
-    return () => {
-      unsubscribe();
-    };
+      );
+    });
+    // const unsubscribe = db.collection("rooms").onSnapshot((snapshot) =>
+    //   setRooms(
+    //     snapshot.docs.map((doc) => ({
+    //       id: doc.id,
+    //       data: doc.data(),
+    //     }))
+    //   )
+    // );
+    // return () => {
+    //   unsubscribe();
+    // };
   }, []);
 
   return (
@@ -54,7 +64,7 @@ const Sidebar = () => {
 
       <div className="sidebar__chats">
         <SidebarChat addNewChat={1} />
-        {rooms.map((room) => (
+        {rooms?.map((room) => (
           <SidebarChat key={room.id} id={room.id} name={room.data.name} />
         ))}
       </div>

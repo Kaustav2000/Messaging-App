@@ -3,10 +3,13 @@ import React, { useEffect, useState } from "react";
 import db from "../firebase";
 import { Link } from "react-router-dom";
 import "./SidebarChat.css";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 
 const SidebarChat = ({ id, name, addNewChat }) => {
   const [seed, setSeed] = useState("");
   const [messages, setMessages] = useState("");
+  const collectionRefMessage = collection(db, "rooms/" + id + "/messages");
+  const collectionRef = collection(db, "rooms");
 
   useEffect(() => {
     setSeed(Math.floor(Math.random() * 5000));
@@ -14,22 +17,16 @@ const SidebarChat = ({ id, name, addNewChat }) => {
 
   useEffect(() => {
     if (id) {
-      db.collection("room")
-        .doc(id)
-        .collection("messages")
-        .orderBy("timestamp", "desc")
-        .onSnapshot((snapshot) =>
-          setMessages(snapshot.docs.map((doc) => doc.data()))
-        );
+      getDocs(collectionRefMessage).then((res) => {
+        setMessages(res.docs.map((doc) => doc.data()));
+      });
     }
-  });
+  }, [id]);
 
   const createChat = () => {
     const roomName = prompt("Please enter name for chat");
     if (roomName) {
-      // to be done
-
-      db.collection("rooms").add({
+      addDoc(collectionRef, {
         name: roomName,
       });
     }
